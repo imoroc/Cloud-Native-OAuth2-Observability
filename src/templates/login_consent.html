@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Authorize {{ client_name }}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f4f5f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.12);
+      padding: 2rem;
+      width: 100%;
+      max-width: 400px;
+    }
+    h1 { font-size: 1.25rem; margin-bottom: .25rem; }
+    .subtitle { color: #666; font-size: .9rem; margin-bottom: 1.5rem; }
+    .scope-badge {
+      display: inline-block;
+      background: #e8f0fe;
+      color: #1a56db;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: .85rem;
+      margin-right: 4px;
+    }
+    label { display: block; font-weight: 500; margin-bottom: .25rem; font-size: .9rem; }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: .5rem .75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: .95rem;
+      margin-bottom: 1rem;
+    }
+    input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,.25); }
+    .actions { display: flex; gap: .75rem; margin-top: .5rem; }
+    button {
+      flex: 1;
+      padding: .6rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: .95rem;
+      cursor: pointer;
+    }
+    .btn-approve { background: #2563eb; color: #fff; }
+    .btn-approve:hover { background: #1d4ed8; }
+    .btn-deny { background: #e5e7eb; color: #374151; }
+    .btn-deny:hover { background: #d1d5db; }
+    .error { background: #fef2f2; color: #b91c1c; padding: .5rem .75rem; border-radius: 6px; margin-bottom: 1rem; font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Sign in</h1>
+    <p class="subtitle">
+      <strong>{{ client_name }}</strong> is requesting access
+      {% if scope %}
+        to:
+        {% for s in scope.split() %}
+          <span class="scope-badge">{{ s }}</span>
+        {% endfor %}
+      {% endif %}
+    </p>
+
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" action="/authorize">
+      {# Carry OAuth2 parameters through as hidden fields #}
+      <input type="hidden" name="client_id"    value="{{ client_id }}">
+      <input type="hidden" name="redirect_uri" value="{{ redirect_uri }}">
+      <input type="hidden" name="response_type" value="{{ response_type }}">
+      <input type="hidden" name="scope"        value="{{ scope }}">
+      <input type="hidden" name="state"        value="{{ state }}">
+
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required autofocus>
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required>
+
+      <div class="actions">
+        <button type="submit" name="action" value="approve" class="btn-approve">Approve</button>
+        <button type="submit" name="action" value="deny" class="btn-deny">Deny</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
