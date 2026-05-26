@@ -52,9 +52,13 @@ Cloud-Native-OAuth2-Observability
  ┃ ┣ 📜 metrics.py
  ┃ ┣ 📜 models.py
  ┃ ┣ 📜 database.py
- ┃ ┗ 📜 seed.py
- ┣ 📜 pyproject.toml  
- ┗ 📜 uv.lock      
+ ┃ ┣ 📜 seed.py
+ ┃ ┣ 🗄️ oauth2.db
+ ┃ ┣ 📜 pyproject.toml  
+ ┃ ┗ 📜 uv.lock  
+ ┗ 📂 templates/         
+   ┗ 🌐 login_consent.html
+    
 ```
 
 ---
