@@ -24,8 +24,8 @@
 ## Architecture & Key Features
 
 * **Identity & Access Management (OAuth2):** Custom modular backend (`oauth2_routes.py`, `admin_routes.py`) acting as a secure identity provider with encrypted token generation and SQLite persistence via ORM (`models.py`).
-* **Cloud-Native Telemetry (`metrics.py`):** The application exposes a custom `/metrics` endpoint, instrumented to feed **Prometheus** (Pull-based telemetry) with data regarding HTTP response codes, latency, and active connections.
-* **Load Testing & Chaos Engineering (`locustfile.py`):** Automated traffic simulation using **Locust** to bombard the authentication endpoints, ensuring the system can handle concurrent authorization flows without degradation.
+* **Cloud-Native Telemetry:** The application exposes a custom `/metrics` endpoint, instrumented to feed **Prometheus** (Pull-based telemetry) with data regarding HTTP response codes, latency, and active connections.
+* **Load Testing & Chaos Engineering:** Integrated **Locust** scripts simulate concurrent traffic and authorization flows, allowing for resilience testing and capacity planning.
 * **Modern Dependency Management:** Utilizes `pyproject.toml` and `uv` for lightning-fast, reproducible dependency resolution.
 
 ---
@@ -34,15 +34,18 @@
 
 ```text
 Cloud-Native-OAuth2-Observability
- ┣ 📂 assets/          # Grafana dashboard previews
- ┣ 📂 docs/            # Technical reports and presentation slides
+ ┣ 📂 assets/          
+ ┃ ┗ 🖼️ dashboard.png
+ ┣ 📂 docs/         
  ┃ ┣ 📜 presentation_slides.pdf
  ┃ ┗ 📜 technical_report.pdf
- ┣ 📂 load-testing/    # Locust stress-testing scripts
+ ┣ 📂 grafana/         
+ ┃ ┗ 📜 dashboard.json
+ ┣ 📂 load-testing/   
  ┃ ┗ 📜 locustfile.py
- ┣ 📂 prometheus/      # Telemetry scrapers configuration
+ ┣ 📂 prometheus/     
  ┃ ┗ 📜 prometheus.yml
- ┣ 📂 src/             # Core Backend Application
+ ┣ 📂 src/         
  ┃ ┣ 📜 app.py
  ┃ ┣ 📜 oauth2_routes.py
  ┃ ┣ 📜 admin_routes.py
@@ -50,8 +53,8 @@ Cloud-Native-OAuth2-Observability
  ┃ ┣ 📜 models.py
  ┃ ┣ 📜 database.py
  ┃ ┗ 📜 seed.py
- ┣ 📜 pyproject.toml   # Project metadata and dependencies
- ┗ 📜 uv.lock          # Dependency lockfile
+ ┣ 📜 pyproject.toml  
+ ┗ 📜 uv.lock      
 ```
 
 ---
@@ -59,9 +62,9 @@ Cloud-Native-OAuth2-Observability
 ## Getting Started & Reproduction Guide
 
 ### Prerequisites
-* Python 3
-* `uv` (Fast Python package installer) or standard `pip`
-* Prometheus & Grafana
+* Python 3.12+
+* `uv` (Fast Python package installer) or `pip`
+* Prometheus & Grafana instances
 
 ### 1. Environment & Database Setup
 Clone the repository, install dependencies, and seed the local database:
@@ -70,20 +73,21 @@ Clone the repository, install dependencies, and seed the local database:
 git clone [https://github.com/imoroc/Cloud-Native-OAuth2-Observability.git](https://github.com/imoroc/Cloud-Native-OAuth2-Observability.git)
 cd Cloud-Native-OAuth2-Observability
 
-# Install dependencies using uv (or pip)
+# Install dependencies
 uv sync
 
-# Navigate to source and initialize the mock database
+# Initialize the mock database
 cd src
 python3 seed.py
 ```
+*Note: This will output the client secrets for `web-app` and `service-account`. Save them.*
 
 ### 2. Run the Backend Service
 Start the authorization server:
 ```bash
 python3 app.py
 ```
-*The application will start, and the telemetry endpoint will be exposed at `http://localhost:[YOUR_PORT]/metrics`.*
+The application runs on `http://localhost:5001`. The metrics endpoint is accessible at `http://localhost:5001/metrics`.
 
 ### 3. Prometheus Configuration
 Start Prometheus pointing to the provided configuration file to begin scraping the backend:
@@ -91,16 +95,22 @@ Start Prometheus pointing to the provided configuration file to begin scraping t
 prometheus --config.file=../prometheus/prometheus.yml
 ```
 
-### 4. Load Testing (Generating Traffic)
-To see the metrics spike in real-time on your Grafana instance, launch the Locust swarm against the backend:
+### 4. Visualizing Data (Grafana)
+1. Open your Grafana instance.
+2. Navigate to **Dashboards > Import**.
+3. Upload the `grafana/dashboard.json` file.
+4. Select your **Prometheus** data source and click **Import**.
+
+### 5. Load Testing (Chaos Engineering)
+To generate traffic and trigger metric spikes:
 ```bash
 cd ../load-testing/
 locust -f locustfile.py
 ```
-*Open `http://localhost:8089` to configure the number of concurrent users and spawn rate.*
+Open `http://localhost:8089`, configure the number of concurrent users, and start the swarm to observe real-time metrics in Grafana.
 
 ---
 
 ### 👨‍💻 Authors
 
-Iván Moro Cienfuegos, Pablo March Ortega and Nicolás Reyes Gutiérrez
+**Iván Moro Cienfuegos, Pablo March Ortega, and Nicolás Reyes Gutiérrez.**
